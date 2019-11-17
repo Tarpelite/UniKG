@@ -7,6 +7,7 @@ from tqdm import *
 import torch
 import torch.utils.data
 import pickle
+import os
 
 from nltk import word_tokenize, pos_tag
 from nltk.stem import PorterStemmer
