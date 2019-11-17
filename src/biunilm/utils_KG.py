@@ -20,7 +20,7 @@ pos_tag_list = ["CC", "CD", "DT", "EX", "FW",
                 "VB", "VBD", "VBG", "VBN", "VBP",
                 "VBZ", "WDT", "WP", "WP$", "WRB"]
 
-pos_tag_dict = {tag:i for i, tag in enumerate(pos_tag_dict)}
+pos_tag_dict = {tag:i for i, tag in enumerate(pos_tag_list)}
 
 pos_tag_lens = 35
 
