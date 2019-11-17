@@ -83,7 +83,6 @@ class Kp20kDataset(Seq2SeqDataset):
     """ Load sentence pair (sequential or random order) from corpus """
 
     def __init__(self, file_src, batch_size, tokenizer, max_len, file_oracle=None, short_sampling_prob=0.1, sent_reverse_order=False, bi_uni_pipeline=[]):
-        super().__init__()
         self.tokenizer = tokenizer  # tokenize function
         self.max_len = max_len  # maximum length of tokens
         self.short_sampling_prob = short_sampling_prob
