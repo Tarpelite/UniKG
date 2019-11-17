@@ -11,6 +11,7 @@ import os
 
 from nltk import word_tokenize, pos_tag
 from nltk.stem import PorterStemmer
+import json
 
 
 pos_tag_list = ["CC", "CD", "DT", "EX", "FW",
