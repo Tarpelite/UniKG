@@ -117,6 +117,7 @@ class Kp20kDataset(Seq2SeqDataset):
                     # label orig sents with pos_tag and present keyphrase
                     pos_tag_seq_orig = [x[1] for x in pos_tag(doc_tk_orig)]
                     pos_tag_idx_orig = []
+                    present_label_idx_orig = [0]*len(doc_tk_orig)
                     for x in pos_tag_seq_orig:
                         if x in pos_tag_dict:
                             pos_tag_idx_orig.append(pos_tag_dict[x])
@@ -125,7 +126,6 @@ class Kp20kDataset(Seq2SeqDataset):
                         
                         keywords_stemmed = " ".join([self.stemmer.stem(x) for x in word_tokenize(keywords)])
 
-                        present_label_idx_orig = [0]*len(doc_tk_orig)
 
                         for i, tk in enumerate(doc_tk_orig):
                             tk_stemmed = self.stemmer.stem(tk)
