@@ -260,7 +260,7 @@ class Kp20kDataset(Seq2SeqDataset):
         
 
         for kk in absent_keyphrase:
-            tgt_tk = tokenizer.tokenize(kk)
+            tgt_tk = self.tokenizer.tokenize(kk)
             if len(tgt_tk) > 0 and len(doc_tk_split) > 0:
                 try:
                     assert len(doc_tk_split) == len(pos_tag_idx_split) == len(present_label_idx_split)
