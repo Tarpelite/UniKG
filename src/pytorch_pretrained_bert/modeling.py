@@ -2370,7 +2370,7 @@ class BertForUniKG(PreTrainedBertModel):
 
         # present keyphrase and pos_tag labelling
         pos_tag_idx = torch.tensor([[i for i in range(len(x))] for x in pos_seq])
-        sequence_output_src = gather_seq_out_by_pos(sequence_output, pos_tag_idx)
+        sequence_output_src = sequence_output
         sequence_output_src = self.dropout(sequence_output_src)
         logits_pos = self.cls_pos(sequence_output_src)
         logits_pre = self.cls_pre(sequence_output_src)

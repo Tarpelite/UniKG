@@ -254,8 +254,8 @@ class Preprocess4Kp20k(Pipeline):
         else:
             tokens = ['[CLS]'] + tokens_a + ['[SEP]'] + tokens_b + ['[SEP]']
         
-        pos_seq = [0] + pos_seq + [0] 
-        pre_seq = [0] + pre_seq + [0] 
+        pos_seq = [0] + pos_seq + [0]  + [0]*len(tokens_b) + [0]
+        pre_seq = [0] + pre_seq + [0]  + [0]*len(tokens_b) + [0]
 
         if self.new_segment_ids:
             if self.mode == "s2s":
@@ -361,6 +361,8 @@ class Preprocess4Kp20k(Pipeline):
         n_pad = self.max_len - len(input_ids)
         input_ids.extend([0]*n_pad)
         segment_ids.extend([0]*n_pad)
+        pos_seq.extend([0]*n_pad)
+        pre_seq.extend([0] * n_pad)
 
 
         if self.num_qkv > 1:
