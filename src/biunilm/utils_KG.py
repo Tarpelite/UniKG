@@ -107,6 +107,7 @@ class Kp20kDataset(Seq2SeqDataset):
         else:
             print("Loading Documents From {}".format(file_src))
             with open(file_src, "r", encoding="utf-8") as f_src:
+                glo_cnt = 0
                 for line in tqdm(f_src.readlines()):
                     line = json.loads(line)
                     doc = line["title"] + " " + line["abstract"]
@@ -151,7 +152,7 @@ class Kp20kDataset(Seq2SeqDataset):
                     # find the absent keyphrases 
                     keywords = line["keyword"].split(";")
                     
-                    doc_stemmed = " ".join([self.stemmer.stem(x) for x in word_tokenize(doc)])
+                    doc_stemmed = " ".join([self.stemmer.stem(x) for x in doc_tk_orig])
                     absent_keyphrase = []
 
                     for kk in keywords:
@@ -161,7 +162,7 @@ class Kp20kDataset(Seq2SeqDataset):
                     
 
                     for kk in absent_keyphrase:
-                        tgt_tk = tokenizer.tokenize(tk)
+                        tgt_tk = tokenizer.tokenize(kk)
                         if len(tgt_tk) > 0 and len(doc_tk_split) > 0:
                             try:
                                 assert len(doc_tk_split) == len(pos_tag_idx_split) == len(present_label_idx_split)
@@ -169,8 +170,16 @@ class Kp20kDataset(Seq2SeqDataset):
                                 print("src length don't match")
                                 print("doc_tk:{}  pos_len:{}  pre_len:{}".format(len(doc_tk_split), len(pos_tag_idx_split), len(present_label_idx_split)))
                             
+                            if glo_cnt < 3:
+                                print(glo_cnt)
+                                print(doc_tk_split)
+                                print(tgt_tk)
+                                print(pos_tag_idx_split)
+                                print(present_label_idx_split)
+                            
+                            glo_cnt += 1
                             self.ex_list.append((doc_tk_split, tgt_tk, pos_tag_idx_split, present_label_idx_split))
-                    
+
             # save to cache
             with open("cached.pl", "wb") as f:
                 pickle.dump(self.ex_list, f)
