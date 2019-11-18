@@ -195,15 +195,15 @@ class Kp20kDataset(Seq2SeqDataset):
             with open("cached.pl", "wb") as f:
                 pickle.dump(self.ex_list, f)
                     
-            print("Load {0} instances".format(len(self.ex_list)))
+        print("Load {0} instances".format(len(self.ex_list)))
 
-            # caculate the statistics
-            src_tk_lens = [len(x[0]) for x in self.ex_list]
-            tgt_tk_lens = [len(x[1]) for x in self.ex_list]
+        # caculate the statistics
+        src_tk_lens = [len(x[0]) for x in self.ex_list]
+        tgt_tk_lens = [len(x[1]) for x in self.ex_list]
 
-            print("Dataset Statistics")
-            print("src_tokens max:{}  min:{}  avg:{}".format(max(src_tk_lens), min(src_tk_lens), sum(src_tk_lens) / len(src_tk_lens)))
-            print("tgt_tokens max:{}  min:{}  avg:{}".format(max(tgt_tk_lens), min(tgt_tk_lens), sum(tgt_tk_lens) / len(tgt_tk_lens)))
+        print("Dataset Statistics")
+        print("src_tokens max:{}  min:{}  avg:{}".format(max(src_tk_lens), min(src_tk_lens), sum(src_tk_lens) / len(src_tk_lens)))
+        print("tgt_tokens max:{}  min:{}  avg:{}".format(max(tgt_tk_lens), min(tgt_tk_lens), sum(tgt_tk_lens) / len(tgt_tk_lens)))
     
     def solve(self, line):
         results = []
