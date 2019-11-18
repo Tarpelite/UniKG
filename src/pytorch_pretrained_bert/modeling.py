@@ -2347,9 +2347,22 @@ class BertForUniKG(PreTrainedBertModel):
             masked_lm_loss_2 = loss_mask_and_normalize(
                 masked_lm_loss_2.float(), masked_weights_2)
             masked_lm_loss = masked_lm_loss + masked_lm_loss_2
+        
+        # present keyphrase and pos_tag labelling
+        pos_tag_idx = torch.tensor([[i for i in range(len(x))] for x in pos_seq])
+        sequence_output_src = sequence_output
+        sequence_output_src = self.dropout(sequence_output_src)
+        logits_pos = self.cls_pos(sequence_output_src)
+        logits_pre = self.cls_pre(sequence_output_src)
+
+        if pos_seq is not None and pre_seq is not None:
+            loss_fct = CrossEntropyLoss()
+            loss_pos = loss_fct(logits_pos.view(-1, 36), pos_seq.view(-1))
+            loss_pre = loss_pos(logits_pre.view(-1, 2), pre_seq.view(-1))
+
 
         if pair_x is None or pair_y is None or pair_r is None or pair_pos_neg_mask is None or pair_loss_mask is None:
-            return masked_lm_loss, next_sentence_loss
+            return masked_lm_loss, next_sentence_loss, loss_pos, loss_pre
 
         # pair and relation
         if pair_x_mask is None or pair_y_mask is None:
@@ -2367,18 +2380,6 @@ class BertForUniKG(PreTrainedBertModel):
         pair_loss = loss_mask_and_normalize(
             pair_loss.float(), pair_loss_mask)
         
-
-        # present keyphrase and pos_tag labelling
-        pos_tag_idx = torch.tensor([[i for i in range(len(x))] for x in pos_seq])
-        sequence_output_src = sequence_output
-        sequence_output_src = self.dropout(sequence_output_src)
-        logits_pos = self.cls_pos(sequence_output_src)
-        logits_pre = self.cls_pre(sequence_output_src)
-
-        if pos_seq is not None and pre_seq is not None:
-            loss_fct = CrossEntropyLoss()
-            loss_pos = loss_fct(logits_pos.view(-1, 36), pos_seq.view(-1))
-            loss_pre = loss_pos(logits_pre.view(-1, 2), pre_seq.view(-1))
 
         return masked_lm_loss, next_sentence_loss, loss_pos, loss_pre
 
