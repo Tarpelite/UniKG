@@ -132,48 +132,48 @@ class Kp20kDataset(Seq2SeqDataset):
                             if tk_stemmed in keywords_stemmed:
                                 present_label_idx_orig[i] = 1
                         
-                        # split orig_idx to wordpiece idx
-                        orig_to_split_map = {}
-                        split_cnt = 0
-                        doc_tk_split = []
-                        pos_tag_idx_split = []
-                        present_label_idx_split = []
-                        for i, tk in enumerate(doc_tk_orig):
-                            tk_pieces = self.tokenizer.tokenize(tk)
-                            orig_to_split_map[i] = []
-                            for tkk in tk_pieces:
-                                doc_tk_split.append(tkk)
-                                pos_tag_idx_split.append(pos_tag_idx_orig[i])
-                                present_label_idx_orig.append(present_label_idx_orig[i])
-                                orig_to_split_map[i].append(split_cnt)
-                                split_cnt += 1
-                        
-                        # find the absent keyphrases 
-                        keywords = line["keyword"].split(";")
-                        
-                        doc_stemmed = " ".join([stemmer.stem(x) for x in word_tokenize(doc)])
-                        absent_keyphrase = []
-
-                        for kk in keywords:
-                            kk_stemmed = " ".join([stemmer.stem(x) for x in word_tokenize(kk)])
-                            if kk_stemmed not in doc_stemmed:
-                                absent_keyphrase.append(kk)
-                        
-
-                        for kk in absent_keyphrase:
-                            tgt_tk = tokenizer.tokenize(tk)
-                            if len(tgt_tk) > 0 and len(doc_tk_split) > 0:
-                                try:
-                                    assert len(doc_tk_split) == len(pos_tag_idx_split) == len(present_label_idx_split)
-                                except Exception as e:
-                                    print("src length don't match")
-                                    print("doc_tk:{}  pos_len:{}  pre_len:{}".format(len(doc_tk_split), len(pos_tag_idx_split), len(present_label_idx_split)))
-                                
-                                self.ex_list.append((doc_tk_split, tgt_tk, pos_tag_idx_split, present_label_idx_split))
+                    # split orig_idx to wordpiece idx
+                    orig_to_split_map = {}
+                    split_cnt = 0
+                    doc_tk_split = []
+                    pos_tag_idx_split = []
+                    present_label_idx_split = []
+                    for i, tk in enumerate(doc_tk_orig):
+                        tk_pieces = self.tokenizer.tokenize(tk)
+                        orig_to_split_map[i] = []
+                        for tkk in tk_pieces:
+                            doc_tk_split.append(tkk)
+                            pos_tag_idx_split.append(pos_tag_idx_orig[i])
+                            present_label_idx_orig.append(present_label_idx_orig[i])
+                            orig_to_split_map[i].append(split_cnt)
+                            split_cnt += 1
                     
-                    # save to cache
-                    with open("cached.pl", "wb") as f:
-                        pickle.dump(self.ex_list, f)
+                    # find the absent keyphrases 
+                    keywords = line["keyword"].split(";")
+                    
+                    doc_stemmed = " ".join([stemmer.stem(x) for x in word_tokenize(doc)])
+                    absent_keyphrase = []
+
+                    for kk in keywords:
+                        kk_stemmed = " ".join([stemmer.stem(x) for x in word_tokenize(kk)])
+                        if kk_stemmed not in doc_stemmed:
+                            absent_keyphrase.append(kk)
+                    
+
+                    for kk in absent_keyphrase:
+                        tgt_tk = tokenizer.tokenize(tk)
+                        if len(tgt_tk) > 0 and len(doc_tk_split) > 0:
+                            try:
+                                assert len(doc_tk_split) == len(pos_tag_idx_split) == len(present_label_idx_split)
+                            except Exception as e:
+                                print("src length don't match")
+                                print("doc_tk:{}  pos_len:{}  pre_len:{}".format(len(doc_tk_split), len(pos_tag_idx_split), len(present_label_idx_split)))
+                            
+                            self.ex_list.append((doc_tk_split, tgt_tk, pos_tag_idx_split, present_label_idx_split))
+                    
+            # save to cache
+            with open("cached.pl", "wb") as f:
+                pickle.dump(self.ex_list, f)
                     
             print("Load {0} instances".format(len(self.ex_list)))
 
