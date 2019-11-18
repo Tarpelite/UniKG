@@ -2210,7 +2210,7 @@ class BertForUniKG(PreTrainedBertModel):
             config, self.bert.embeddings.word_embeddings.weight, num_labels=num_labels)
         self.num_sentlvl_labels = num_sentlvl_labels
         self.cls2 = None
-        self.cls_pos = nn.linear(config.hidden_size, 36)
+        self.cls_pos = nn.Linear(config.hidden_size, 36)
         self.cls_pre = nn.Linear(config.hidden_size, 2)
         self.dropout = nn.Dropout(config.hidden_dropout_prob)
         if self.num_sentlvl_labels > 0:
