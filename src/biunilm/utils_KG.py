@@ -151,11 +151,11 @@ class Kp20kDataset(Seq2SeqDataset):
                     # find the absent keyphrases 
                     keywords = line["keyword"].split(";")
                     
-                    doc_stemmed = " ".join([stemmer.stem(x) for x in word_tokenize(doc)])
+                    doc_stemmed = " ".join([self.stemmer.stem(x) for x in word_tokenize(doc)])
                     absent_keyphrase = []
 
                     for kk in keywords:
-                        kk_stemmed = " ".join([stemmer.stem(x) for x in word_tokenize(kk)])
+                        kk_stemmed = " ".join([self.stemmer.stem(x) for x in word_tokenize(kk)])
                         if kk_stemmed not in doc_stemmed:
                             absent_keyphrase.append(kk)
                     
