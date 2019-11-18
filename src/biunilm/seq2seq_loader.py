@@ -91,6 +91,7 @@ class Seq2SeqDataset(torch.utils.data.Dataset):
 
     def __getitem__(self, idx):
         instance = self.ex_list[idx]
+        proc = choice(self.bi_uni_pipeline)
         instance = proc(instance)
         return instance
 
