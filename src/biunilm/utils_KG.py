@@ -12,6 +12,7 @@ import os
 from nltk import word_tokenize, pos_tag
 from nltk.stem import PorterStemmer
 import json
+from multiprocessing import cpu_count, Pool
 
 
 pos_tag_list = ["CC", "CD", "DT", "EX", "FW",
@@ -106,79 +107,89 @@ class Kp20kDataset(Seq2SeqDataset):
         
         else:
             print("Loading Documents From {}".format(file_src))
+            data = []
             with open(file_src, "r", encoding="utf-8") as f_src:
-                glo_cnt = 0
-                for line in tqdm(f_src.readlines()):
-                    line = json.loads(line)
-                    doc = line["title"] + " " + line["abstract"]
-                    keywords = line["keyword"].replace(";", " ")
+                for line in f_src.readlines():
+                    data.append(line.strip())
+            
+            with Pool(cpu_count()) as p:
+                results = list(tqdm(p.imap(self.solve, data), total=len(data)))
+            
+            for res in results:
+                if len(res) > 0:
+                    self.ex_list.append(res)
+                # glo_cnt = 0
+                # for line in tqdm(f_src.readlines()):
+                #     line = json.loads(line)
+                #     doc = line["title"] + " " + line["abstract"]
+                #     keywords = line["keyword"].replace(";", " ")
 
-                    doc_tk_orig = word_tokenize(doc)
+                #     doc_tk_orig = word_tokenize(doc)
 
-                    # label orig sents with pos_tag and present keyphrase
-                    pos_tag_seq_orig = [x[1] for x in pos_tag(doc_tk_orig)]
-                    pos_tag_idx_orig = []
-                    present_label_idx_orig = [0]*len(doc_tk_orig)
-                    for x in pos_tag_seq_orig:
-                        if x in pos_tag_dict:
-                            pos_tag_idx_orig.append(pos_tag_dict[x])
-                        else:
-                            pos_tag_idx_orig.append(0)
+                #     # label orig sents with pos_tag and present keyphrase
+                #     pos_tag_seq_orig = [x[1] for x in pos_tag(doc_tk_orig)]
+                #     pos_tag_idx_orig = []
+                #     present_label_idx_orig = [0]*len(doc_tk_orig)
+                #     for x in pos_tag_seq_orig:
+                #         if x in pos_tag_dict:
+                #             pos_tag_idx_orig.append(pos_tag_dict[x])
+                #         else:
+                #             pos_tag_idx_orig.append(0)
                         
-                        keywords_stemmed = " ".join([self.stemmer.stem(x) for x in word_tokenize(keywords)])
+                #         keywords_stemmed = " ".join([self.stemmer.stem(x) for x in word_tokenize(keywords)])
 
 
-                        for i, tk in enumerate(doc_tk_orig):
-                            tk_stemmed = self.stemmer.stem(tk)
-                            if tk_stemmed in keywords_stemmed:
-                                present_label_idx_orig[i] = 1
+                #         for i, tk in enumerate(doc_tk_orig):
+                #             tk_stemmed = self.stemmer.stem(tk)
+                #             if tk_stemmed in keywords_stemmed:
+                #                 present_label_idx_orig[i] = 1
                         
-                    # split orig_idx to wordpiece idx
-                    orig_to_split_map = {}
-                    split_cnt = 0
-                    doc_tk_split = []
-                    pos_tag_idx_split = []
-                    present_label_idx_split = []
-                    for i, tk in enumerate(doc_tk_orig):
-                        tk_pieces = self.tokenizer.tokenize(tk)
-                        orig_to_split_map[i] = []
-                        for tkk in tk_pieces:
-                            doc_tk_split.append(tkk)
-                            pos_tag_idx_split.append(pos_tag_idx_orig[i])
-                            present_label_idx_split.append(present_label_idx_orig[i])
-                            orig_to_split_map[i].append(split_cnt)
-                            split_cnt += 1
+                #     # split orig_idx to wordpiece idx
+                #     orig_to_split_map = {}
+                #     split_cnt = 0
+                #     doc_tk_split = []
+                #     pos_tag_idx_split = []
+                #     present_label_idx_split = []
+                #     for i, tk in enumerate(doc_tk_orig):
+                #         tk_pieces = self.tokenizer.tokenize(tk)
+                #         orig_to_split_map[i] = []
+                #         for tkk in tk_pieces:
+                #             doc_tk_split.append(tkk)
+                #             pos_tag_idx_split.append(pos_tag_idx_orig[i])
+                #             present_label_idx_split.append(present_label_idx_orig[i])
+                #             orig_to_split_map[i].append(split_cnt)
+                #             split_cnt += 1
                     
-                    # find the absent keyphrases 
-                    keywords = line["keyword"].split(";")
+                #     # find the absent keyphrases 
+                #     keywords = line["keyword"].split(";")
                     
-                    doc_stemmed = " ".join([self.stemmer.stem(x) for x in doc_tk_orig])
-                    absent_keyphrase = []
+                #     doc_stemmed = " ".join([self.stemmer.stem(x) for x in doc_tk_orig])
+                #     absent_keyphrase = []
 
-                    for kk in keywords:
-                        kk_stemmed = " ".join([self.stemmer.stem(x) for x in word_tokenize(kk)])
-                        if kk_stemmed not in doc_stemmed:
-                            absent_keyphrase.append(kk)
+                #     for kk in keywords:
+                #         kk_stemmed = " ".join([self.stemmer.stem(x) for x in word_tokenize(kk)])
+                #         if kk_stemmed not in doc_stemmed:
+                #             absent_keyphrase.append(kk)
                     
 
-                    for kk in absent_keyphrase:
-                        tgt_tk = tokenizer.tokenize(kk)
-                        if len(tgt_tk) > 0 and len(doc_tk_split) > 0:
-                            try:
-                                assert len(doc_tk_split) == len(pos_tag_idx_split) == len(present_label_idx_split)
-                            except Exception as e:
-                                print("src length don't match")
-                                print("doc_tk:{}  pos_len:{}  pre_len:{}".format(len(doc_tk_split), len(pos_tag_idx_split), len(present_label_idx_split)))
+                #     for kk in absent_keyphrase:
+                #         tgt_tk = tokenizer.tokenize(kk)
+                #         if len(tgt_tk) > 0 and len(doc_tk_split) > 0:
+                #             try:
+                #                 assert len(doc_tk_split) == len(pos_tag_idx_split) == len(present_label_idx_split)
+                #             except Exception as e:
+                #                 print("src length don't match")
+                #                 print("doc_tk:{}  pos_len:{}  pre_len:{}".format(len(doc_tk_split), len(pos_tag_idx_split), len(present_label_idx_split)))
                             
-                            if glo_cnt < 3:
-                                print(glo_cnt)
-                                print(doc_tk_split)
-                                print(tgt_tk)
-                                print(pos_tag_idx_split)
-                                print(present_label_idx_split)
+                #             if glo_cnt < 3:
+                #                 print(glo_cnt)
+                #                 print(doc_tk_split)
+                #                 print(tgt_tk)
+                #                 print(pos_tag_idx_split)
+                #                 print(present_label_idx_split)
                             
-                            glo_cnt += 1
-                            self.ex_list.append((doc_tk_split, tgt_tk, pos_tag_idx_split, present_label_idx_split))
+                #             glo_cnt += 1
+                #             self.ex_list.append((doc_tk_split, tgt_tk, pos_tag_idx_split, present_label_idx_split))
 
             # save to cache
             with open("cached.pl", "wb") as f:
@@ -193,6 +204,73 @@ class Kp20kDataset(Seq2SeqDataset):
             print("Dataset Statistics")
             print("src_tokens max:{}  min:{}  avg:{}".format(max(src_tk_lens), min(src_tk_lens), sum(src_tk_lens) / len(src_tk_lens)))
             print("tgt_tokens max:{}  min:{}  avg:{}".format(max(tgt_tk_lens), min(tgt_tk_lens), sum(tgt_tk_lens) / len(tgt_tk_lens)))
+    
+    def solve(self, line):
+        results = []
+        line = json.loads(line)
+        doc = line["title"] + " " + line["abstract"]
+        keywords = line["keyword"].replace(";", " ")
+
+        doc_tk_orig = word_tokenize(doc)
+
+        # label orig sents with pos_tag and present keyphrase
+        pos_tag_seq_orig = [x[1] for x in pos_tag(doc_tk_orig)]
+        pos_tag_idx_orig = []
+        present_label_idx_orig = [0]*len(doc_tk_orig)
+        for x in pos_tag_seq_orig:
+            if x in pos_tag_dict:
+                pos_tag_idx_orig.append(pos_tag_dict[x])
+            else:
+                pos_tag_idx_orig.append(0)
+            
+            keywords_stemmed = " ".join([self.stemmer.stem(x) for x in word_tokenize(keywords)])
+
+
+            for i, tk in enumerate(doc_tk_orig):
+                tk_stemmed = self.stemmer.stem(tk)
+                if tk_stemmed in keywords_stemmed:
+                    present_label_idx_orig[i] = 1
+            
+        # split orig_idx to wordpiece idx
+        orig_to_split_map = {}
+        split_cnt = 0
+        doc_tk_split = []
+        pos_tag_idx_split = []
+        present_label_idx_split = []
+        for i, tk in enumerate(doc_tk_orig):
+            tk_pieces = self.tokenizer.tokenize(tk)
+            orig_to_split_map[i] = []
+            for tkk in tk_pieces:
+                doc_tk_split.append(tkk)
+                pos_tag_idx_split.append(pos_tag_idx_orig[i])
+                present_label_idx_split.append(present_label_idx_orig[i])
+                orig_to_split_map[i].append(split_cnt)
+                split_cnt += 1
+        
+        # find the absent keyphrases 
+        keywords = line["keyword"].split(";")
+        
+        doc_stemmed = " ".join([self.stemmer.stem(x) for x in doc_tk_orig])
+        absent_keyphrase = []
+
+        for kk in keywords:
+            kk_stemmed = " ".join([self.stemmer.stem(x) for x in word_tokenize(kk)])
+            if kk_stemmed not in doc_stemmed:
+                absent_keyphrase.append(kk)
+        
+
+        for kk in absent_keyphrase:
+            tgt_tk = tokenizer.tokenize(kk)
+            if len(tgt_tk) > 0 and len(doc_tk_split) > 0:
+                try:
+                    assert len(doc_tk_split) == len(pos_tag_idx_split) == len(present_label_idx_split)
+                except Exception as e:
+                    print("src length don't match")
+                    print("doc_tk:{}  pos_len:{}  pre_len:{}".format(len(doc_tk_split), len(pos_tag_idx_split), len(present_label_idx_split)))
+                results.append((doc_tk_split, tgt_tk, pos_tag_idx_split, present_label_idx_split))
+        return results
+                
+        
 
 
 class Preprocess4Kp20k(Pipeline):
