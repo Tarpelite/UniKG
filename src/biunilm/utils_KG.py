@@ -144,7 +144,7 @@ class Kp20kDataset(Seq2SeqDataset):
                         for tkk in tk_pieces:
                             doc_tk_split.append(tkk)
                             pos_tag_idx_split.append(pos_tag_idx_orig[i])
-                            present_label_idx_orig.append(present_label_idx_orig[i])
+                            present_label_idx_split.append(present_label_idx_orig[i])
                             orig_to_split_map[i].append(split_cnt)
                             split_cnt += 1
                     
