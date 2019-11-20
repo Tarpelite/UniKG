@@ -2355,16 +2355,16 @@ class BertForUniKG(PreTrainedBertModel):
         logits_pos = self.cls_pos(sequence_output_src)
         logits_pre = self.cls_pre(sequence_output_src)
 
-        print("logits pos", type(logits_pos))
-        print("logits pre", type(logits_pre))
+        # print("logits pos", type(logits_pos))
+        # print("logits pre", type(logits_pre))
 
-        print("pos_seq", type(pos_seq))
-        print("pre_seq", type(pre_seq))
+        # print("pos_seq", type(pos_seq))
+        # print("pre_seq", type(pre_seq))
 
         if pos_seq is not None and pre_seq is not None:
             loss_fct = CrossEntropyLoss()
-            loss_pos = loss_fct(logits_pos.view(-1, 36), pos_seq.view(-1))
-            loss_pre = loss_pos(logits_pre.view(-1, 2), pre_seq.view(-1))
+            loss_pos = loss_fct(logits_pos.data.view(-1, 36), pos_seq.data.view(-1))
+            loss_pre = loss_pos(logits_pre.data.view(-1, 2), pre_seq.data.view(-1))
 
 
         if pair_x is None or pair_y is None or pair_r is None or pair_pos_neg_mask is None or pair_loss_mask is None:
