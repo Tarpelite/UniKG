@@ -2352,8 +2352,14 @@ class BertForUniKG(PreTrainedBertModel):
         pos_tag_idx = torch.tensor([[i for i in range(len(x))] for x in pos_seq])
         sequence_output_src = sequence_output
         sequence_output_src = self.dropout(sequence_output_src)
-        logits_pos = self.cls_pos(sequence_output_src).data
-        logits_pre = self.cls_pre(sequence_output_src).data
+        logits_pos = self.cls_pos(sequence_output_src)
+        logits_pre = self.cls_pre(sequence_output_src)
+
+        print("logits pos", type(logits_pos))
+        print("logits pre", type(logits_pre))
+
+        print("pos_seq", type(pos_seq))
+        print("pre_seq", type(pre_seq))
 
         if pos_seq is not None and pre_seq is not None:
             loss_fct = CrossEntropyLoss()
