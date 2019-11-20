@@ -143,7 +143,7 @@ class Kp20kDataset(Seq2SeqDataset):
         doc_tk_orig = word_tokenize(doc)
 
         # label orig sents with pos_tag and present keyphrase
-        pos_tag_seq_orig = [pos_tag_dict[x[1]] for x in pos_tag(doc_tk_orig)]
+        pos_tag_seq_orig = [x[1] for x in pos_tag(doc_tk_orig)]
         pos_tag_idx_orig = []
         present_label_idx_orig = [0]*len(doc_tk_orig)
         for x in pos_tag_seq_orig:
