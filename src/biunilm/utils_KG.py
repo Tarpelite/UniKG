@@ -27,7 +27,7 @@ pos_tag_dict = {tag:i for i, tag in enumerate(pos_tag_list)}
 
 pos_tag_lens = 35
 
-def truncate_tokens_pair(tokens_a, tokens_b, pos_seq, pre_seq, max_len, max_len_a=0, max_len_b=0, trunc_seg=None, always_truncate_tail=False):
+def my_truncate_tokens_pair(tokens_a, tokens_b, pos_seq, pre_seq, max_len, max_len_a=0, max_len_b=0, trunc_seg=None, always_truncate_tail=False):
     num_truncated_a = [0, 0]
     num_truncated_b = [0, 0]
     trunc_flag = "a"
@@ -249,7 +249,7 @@ class Preprocess4Kp20k(Pipeline):
             tokens_b = ['[S2S_SOS]'] + tokens_b
 
         # -3  for special tokens [CLS], [SEP], [SEP]
-        num_truncated_a, _ = truncate_tokens_pair(tokens_a, tokens_b, pos_seq, pre_seq, self.max_len - 3, max_len_a=self.max_len_a,
+        num_truncated_a, _ = my_truncate_tokens_pair(tokens_a, tokens_b, pos_seq, pre_seq, self.max_len - 3, max_len_a=self.max_len_a,
                                                   max_len_b=self.max_len_b, trunc_seg=self.trunc_seg, always_truncate_tail=self.always_truncate_tail)
 
         try:
