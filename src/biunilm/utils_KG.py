@@ -145,7 +145,6 @@ class Kp20kDataset(Seq2SeqDataset):
         # label orig sents with pos_tag and present keyphrase
         pos_tag_seq_orig = [x[1] for x in pos_tag(doc_tk_orig)]
         pos_tag_idx_orig = []
-        present_label_idx_orig = [0]*len(doc_tk_orig)
         for x in pos_tag_seq_orig:
             if x in pos_tag_dict:
                 pos_tag_idx_orig.append(pos_tag_dict[x])
@@ -165,7 +164,7 @@ class Kp20kDataset(Seq2SeqDataset):
         split_cnt = 0
         doc_tk_split = []
         pos_tag_idx_split = []
-        present_label_idx_split = []
+       
         for i, tk in enumerate(doc_tk_orig):
             tk_pieces = self.tokenizer.tokenize(tk)
             orig_to_split_map[i] = []
@@ -183,14 +182,15 @@ class Kp20kDataset(Seq2SeqDataset):
             if len(tgt_tk) > 0 and len(doc_tk_split) > 0:
                 present_label_idx_orig = [0]*len(doc_tk_orig)
                 kk_stemmed = " ".join([self.stemmer.stem(x) for x in word_tokenize(kk)])
-                present_label_idx_split = []
+                present_label_idx_split = [0]*len(pos_tag_idx_split)
                 for i, tk in enumerate(doc_tk_orig):
                     tk_stemmed = self.stemmer.stem(tk)
                     if tk_stemmed in kk_stemmed:
                         present_label_idx_orig[i] = 1
-                    tk_pieces = self.tokenizer.tokenize(tk)
-                    for tkk in tk_pieces:
-                        present_label_idx_split.append(present_label_idx_orig[i])
+                    for orig_k in orig_to_split_map:
+                        split_idx = orig_to_split_map[orig_k]
+                        for idx in split_idx:
+                            present_label_idx_split[idx] = present_label_idx_orig[orig_k] 
                 try:
                     assert len(doc_tk_split) == len(pos_tag_idx_split) == len(present_label_idx_split)
                 except Exception as e:
