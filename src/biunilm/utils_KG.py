@@ -240,10 +240,10 @@ class Preprocess4Kp20k(Pipeline):
 
         tokens_a, tokens_b, pos_seq, pre_seq = instance
 
-        print("first sequence:")
-        print("tokens_a", len(tokens_a))
-        print("pos_seq", len(pos_seq))
-        print("pre_seq", len(pre_seq))
+        # print("first sequence:")
+        # print("tokens_a", len(tokens_a))
+        # print("pos_seq", len(pos_seq))
+        # print("pre_seq", len(pre_seq))
 
         if self.pos_shift:
             tokens_b = ['[S2S_SOS]'] + tokens_b
