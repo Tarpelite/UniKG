@@ -443,7 +443,7 @@ def main():
                 loss = masked_lm_loss + next_sentence_loss + pos_loss + pre_loss
 
                 # logging for each step (i.e., before normalization by args.gradient_accumulation_steps)
-                iter_bar.set_description('Iter (loss=%5.3f, pre_loss=%5.3f, pos_loss=%5.3f)' % (loss.item(), pre_loss.item(). pos_loss.item()))
+                iter_bar.set_description('Iter (loss=%5.3f, pre_loss=%5.3f, pos_loss=%5.3f)' % (loss.item(), pre_loss.item(), pos_loss.item()))
 
                 # ensure that accumlated gradients are normalized
                 if args.gradient_accumulation_steps > 1:
