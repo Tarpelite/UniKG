@@ -190,7 +190,7 @@ class Kp20kDataset(Seq2SeqDataset):
                         present_label_idx_orig[i] = 1
                     tk_pieces = self.tokenizer.tokenize(tk)
                     for tkk in tk_pieces:
-                        present_label_idx_split.append(pos_tag_idx_orig[i])
+                        present_label_idx_split.append(present_label_idx_orig[i])
                 try:
                     assert len(doc_tk_split) == len(pos_tag_idx_split) == len(present_label_idx_split)
                 except Exception as e:

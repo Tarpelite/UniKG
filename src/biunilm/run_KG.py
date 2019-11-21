@@ -430,16 +430,9 @@ def main():
                 else:
                     input_ids, segment_ids, pos_seq, pre_seq, input_mask, mask_qkv, lm_label_ids, masked_pos, masked_weights, is_next, task_idx = batch
                     oracle_pos, oracle_weights, oracle_labels = None, None, None
-                try:
-                    print("pos_seq", Counter(pos_seq.view(-1).detach().cpu().numpy()))
-                    print("pre_seq", Counter(pre_seq.view(-1).detach().cpu().numpy()))
                 
-                    loss_tuple = model(input_ids, segment_ids, input_mask, lm_label_ids, is_next, masked_pos=masked_pos, masked_weights=masked_weights, task_idx=task_idx, masked_pos_2=oracle_pos, masked_weights_2=oracle_weights,
-                                        masked_labels_2=oracle_labels, mask_qkv=mask_qkv, pos_seq=pos_seq, pre_seq=pre_seq)
-                except Exception as e:
-                    print("pos_seq", Counter(pos_seq.detach().cpu().numpy()))
-                    print("pre_seq", Counter(pre_seq.detach().cpu().numpy()))
-                
+                loss_tuple = model(input_ids, segment_ids, input_mask, lm_label_ids, is_next, masked_pos=masked_pos, masked_weights=masked_weights, task_idx=task_idx, masked_pos_2=oracle_pos, masked_weights_2=oracle_weights,
+                                    masked_labels_2=oracle_labels, mask_qkv=mask_qkv, pos_seq=pos_seq, pre_seq=pre_seq)
                 masked_lm_loss, next_sentence_loss, pos_loss, pre_loss= loss_tuple
                 if n_gpu > 1:    # mean() to average on multi-gpu.
                     # loss = loss.mean()
