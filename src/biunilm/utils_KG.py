@@ -362,7 +362,7 @@ class Preprocess4Kp20k(Pipeline):
         input_ids.extend([0]*n_pad)
         segment_ids.extend([0]*n_pad)
         pos_seq.extend([0]*n_pad)
-        pre_seq.extend([0] * n_pad)
+        pre_seq.extend([0]*n_pad)
 
 
         if self.num_qkv > 1:
@@ -418,7 +418,7 @@ class Preprocess4Kp20k(Pipeline):
                     oracle_pos, oracle_weights, oracle_labels)
         
         try:
-            pass
+            assert len(input_ids) == len(pos_seq) == len(pre_seq)
         except Exception as e:
             print("input_ids length doesn not match pos_seq length and pre seq length")
             print("input_ids: {}, pos_seq: {}, pre_seq:{}".format(len(input_ids), len(pos_seq), len(pre_seq)))
