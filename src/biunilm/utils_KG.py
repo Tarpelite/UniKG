@@ -247,6 +247,12 @@ class Preprocess4Kp20k(Pipeline):
         num_truncated_a, _ = truncate_tokens_pair(tokens_a, tokens_b, pos_seq, pre_seq, self.max_len - 3, max_len_a=self.max_len_a,
                                                   max_len_b=self.max_len_b, trunc_seg=self.trunc_seg, always_truncate_tail=self.always_truncate_tail)
 
+        try:
+            assert len(tokens_a) == len(pos_seq) == len(pre_seq)
+        except Exception as e:
+            print("tokens_a", len(tokens_a))
+            print("pos_seq", len(pos_seq))
+            print("pre_seq", len(pre_seq))
         # Add Special Tokens
         if self.s2s_special_token:
             tokens = ['[S2S_CLS]'] + tokens_a + \
